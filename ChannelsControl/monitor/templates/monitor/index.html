@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{title}} :: {{block.super}}
+{% endblock %}
+
+{% block sidebar %}
+{{ rand }}
+{% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<h1>Актуальные проблемы каналов</h1>
+{% endblock %}
