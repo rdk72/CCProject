@@ -11,4 +11,41 @@
 
 {% block content %}
 <h1>Актуальные проблемы каналов</h1>
+<table class="table table-hover table-dark">
+    <thead >
+    <tr>
+        <td>Оператор</td>
+        <td>Каналы связи</td>
+        <td>Время отключения</td>
+        <td>Время включения</td>
+        <td>Период пропадания</td>
+        <td>Статус</td>
+        <td>Номер заявки</td>
+        <td>Дополнительная информация</td>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for incident in incidents %}
+
+    <tr>
+        <td>Оператор</td>
+        <td>
+        {% for channel in incident.channels.all %}
+        {{ channel }}
+        <br>
+        {% endfor %}
+        </td>
+        <td>{{ incident.date_time_from }}</td>
+        <td>{{ incident.date_time_to }}</td>
+        <td>Период пропадания</td>
+        <td>{{ incident.state }}</td>
+        <td>{{ incident.request }}</td>
+        <td>{{ incident.more_info }}</td>
+
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
 {% endblock %}
