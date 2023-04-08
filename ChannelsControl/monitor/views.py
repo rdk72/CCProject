@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from django.http import HttpResponse
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import *
 
 class Home(ListView):
@@ -15,18 +15,20 @@ class Home(ListView):
         context['title'] = 'Актуальные проблемы каналов связи'
         return context
 
-    class EditIncident(DetailView):
-        model = Incident
-        context_object_name = 'incident_item'
+class EditIncident(UpdateView):
+    model = Incident
+    fields = ['channels', 'date_time_from', 'date_time_to', 'state', 'request', 'more_info']
+    context_object_name = 'incident_item'
+    template_name = 'monitor/incident.html'
 
 
 
-    class AddIncident(CreateView):
+class AddIncident(CreateView):
  #       form_class = NewsForm
-        template_name = 'news/add_incident.html'
+    template_name = 'news/add_incident.html'
         # success_url = reverse_lazy('home')
         # login_url = '/admin/'
-        raise_exception = True
+    raise_exception = True
 
 #def index(request):
     #incidents = Incidents.objects.all()

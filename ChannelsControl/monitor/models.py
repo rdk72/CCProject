@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название')
@@ -64,6 +65,9 @@ class Incident(models.Model):
 
     def __str__(self):
         return str(self.date_time_from)
+
+    def get_absolute_url(self):
+        return reverse("incident",kwargs={"incident_id":self.pk})
 
     class Meta:
         verbose_name = 'Пропадание канала связи'
