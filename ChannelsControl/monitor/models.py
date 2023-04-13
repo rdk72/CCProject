@@ -67,7 +67,7 @@ class Incident(models.Model):
         return str(self.date_time_from)
 
     def get_absolute_url(self):
-        return reverse("incident",kwargs={"incident_id":self.pk})
+        return reverse("incident", kwargs={"incident_id": self.pk})
 
     class Meta:
         verbose_name = 'Пропадание канала связи'
