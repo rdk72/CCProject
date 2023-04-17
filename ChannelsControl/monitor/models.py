@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from smart_selects.db_fields import ChainedManyToManyField
 
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название')
@@ -52,7 +53,15 @@ class Channel(models.Model):
 
 
 class Incident(models.Model):
-    channels = models.ManyToManyField(Channel, verbose_name="Список каналов")
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, verbose_name='Оператор')
+    #channels = models.ManyToManyField(Channel, verbose_name="Список каналов")
+    channels = ChainedManyToManyField(
+        Channel,
+        horizontal=True,
+        verbose_name='Список каналов',
+        chained_field="provider",
+        chained_model_field="provider"
+    )
     date_time_from = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, verbose_name="Время пропадания")
     date_time_to = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True, verbose_name="Время восстановления")
     STATE_TYPES = (

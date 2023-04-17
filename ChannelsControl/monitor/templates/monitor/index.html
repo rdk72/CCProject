@@ -27,9 +27,14 @@
     <tbody>
 
     {% for incident in incidents %}
-
     <tr>
-        <td>Оператор</td>
+
+
+        <td>
+            <a href="{{ incident.get_absolute_url }}">
+            Оператор
+            </a>
+        </td>
         <td>
         {% for channel in incident.channels.all %}
         {{ channel }}
@@ -44,6 +49,7 @@
         <td>{{ incident.more_info }}</td>
 
     </tr>
+
     {% endfor %}
 
     </tbody>

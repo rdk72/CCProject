@@ -17,7 +17,7 @@ class Home(ListView):
 
 class EditIncident(UpdateView):
     model = Incident
-    fields = ['channels', 'date_time_from', 'date_time_to', 'state', 'request', 'more_info']
+    fields = ['provider', 'channels', 'date_time_from', 'date_time_to', 'state', 'request', 'more_info']
     context_object_name = 'incident_item'
     template_name = 'monitor/incident.html'
     pk_url_kwarg = 'incident_id'
