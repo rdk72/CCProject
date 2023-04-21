@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import *
+from .forms import *
 
 class Home(ListView):
     model = Incident
@@ -17,10 +18,14 @@ class Home(ListView):
 
 class EditIncident(UpdateView):
     model = Incident
-    fields = ['provider', 'channels', 'date_time_from', 'date_time_to', 'state', 'request', 'more_info']
+    #fields = ['provider', 'channels', 'date_time_from', 'date_time_to', 'type', 'request', 'more_info', 'state']
+    form_class = IncidentEditForm
     context_object_name = 'incident_item'
     template_name = 'monitor/incident.html'
     pk_url_kwarg = 'incident_id'
+
+    def get_success_url(self):
+        return reverse("home")
 
 
 

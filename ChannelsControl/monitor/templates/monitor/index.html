@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load monitor_tags %}
+
 
 {% block title %}
 {{title}} :: {{block.super}}
@@ -18,8 +20,8 @@
         <td>Каналы связи</td>
         <td>Время отключения</td>
         <td>Время включения</td>
-        <td>Период пропадания</td>
-        <td>Статус</td>
+        <td>Простой</td>
+        <td>Тип проблемы</td>
         <td>Номер заявки</td>
         <td>Дополнительная информация</td>
     </tr>
@@ -32,7 +34,7 @@
 
         <td>
             <a href="{{ incident.get_absolute_url }}">
-            Оператор
+            {{ incident.provider }}
             </a>
         </td>
         <td>
@@ -41,10 +43,10 @@
         <br>
         {% endfor %}
         </td>
-        <td>{{ incident.date_time_from }}</td>
-        <td>{{ incident.date_time_to }}</td>
-        <td>Период пропадания</td>
-        <td>{{ incident.state }}</td>
+        <td>{{ incident.date_time_from|date:"d.m.y H:i" }}</td>
+        <td>{{ incident.date_time_to|date:"d.m.y H:i" }}</td>
+        <td>{{ incident.date_time_from|period:incident.date_time_to }}</td>
+        <td>{{ incident.type }}</td>
         <td>{{ incident.request }}</td>
         <td>{{ incident.more_info }}</td>
 

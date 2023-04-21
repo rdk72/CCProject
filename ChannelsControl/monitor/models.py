@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from smart_selects.db_fields import ChainedManyToManyField
 
+
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название')
 
@@ -43,7 +44,8 @@ class Channel(models.Model):
     more_info = models.CharField(max_length=400, blank=True, verbose_name='Дополнительная информация')
 
     def __str__(self):
-        return str(self.provider) + " " + str(self.city_a) +" - " + str(self.city_b)
+        #return str(self.provider) + " " + str(self.city_a) +" - " + str(self.city_b)
+        return str(self.city_a) +" - " + str(self.city_b)
 
     class Meta:
         verbose_name = 'Канал связи'
@@ -65,12 +67,19 @@ class Incident(models.Model):
     date_time_from = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, verbose_name="Время пропадания")
     date_time_to = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True, verbose_name="Время восстановления")
     STATE_TYPES = (
-        ('I', 'In process'),
-        ('C', 'Incident closed'),
+        ('I', 'Проблема актуальна'),
+        ('C', 'Проблема закрыта'),
     )
     state = models.CharField(max_length=1, choices=STATE_TYPES, default="I", verbose_name="Статус")
+    INCIDENT_TYPES = (
+        ('U', 'Нестабильная работа'),
+        ('L', 'Потеря пакетов'),
+        ('F', 'Полное отсутствие'),
+    )
+    type = models.CharField(max_length=1, choices=INCIDENT_TYPES, default="F", verbose_name="Тип проблемы")
     request = models.CharField(max_length=100, blank=True, verbose_name="Номер заявки")
     more_info = models.CharField(max_length=400, blank=True, verbose_name='Дополнительная информация')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
 
     def __str__(self):
         return str(self.date_time_from)

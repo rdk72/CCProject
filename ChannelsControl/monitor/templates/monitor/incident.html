@@ -11,6 +11,7 @@
 
 {% block content %}
 <h1>Пропадание канала №{{ incident_item.pk }}</h1>
+
 <form method="post">
     {% csrf_token %}
     {{ form.media.js }}
@@ -18,5 +19,5 @@
 
     <input type="submit" value="Update">
 </form>
-
+<br> Последнее редактирование: {{ incident_item.updated_at }}
 {% endblock %}
