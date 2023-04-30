@@ -13,7 +13,8 @@ def period(date_from, date_to):
     seconds = duration.seconds #total seconds
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60
-    return plural_days(duration.days)+'{:02}ч {:02}м {:02}с'.format(hours,minutes,seconds % 60 )
+    #return plural_days(duration.days)+'{:02}ч {:02}м {:02}с'.format(hours,minutes,seconds % 60 )
+    return plural_days(duration.days)+'{:02}ч {:02}м'.format(hours,minutes)
 
 
 

@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>Актуальные проблемы каналов</h1>
+<h1>{{title}} </h1>
 <table class="table table-hover table-dark">
     <thead >
     <tr>
@@ -24,6 +24,11 @@
         <td>Тип проблемы</td>
         <td>Номер заявки</td>
         <td>Дополнительная информация</td>
+        {% if request.resolver_match.url_name == 'history' %}
+        <td>Статус</td>
+        {% endif %}
+
+
     </tr>
     </thead>
     <tbody>
@@ -46,9 +51,24 @@
         <td>{{ incident.date_time_from|date:"d.m.y H:i" }}</td>
         <td>{{ incident.date_time_to|date:"d.m.y H:i" }}</td>
         <td>{{ incident.date_time_from|period:incident.date_time_to }}</td>
-        <td>{{ incident.type }}</td>
+        <td>{{ incident.get_type_display }}</td>
         <td>{{ incident.request }}</td>
         <td>{{ incident.more_info }}</td>
+        {% if request.resolver_match.url_name == 'history' %}
+
+             {% if incident.state == 'I' %}
+        <td class="bg-danger">
+             <span >Актуальна</span>
+        </td>
+             {% else %}
+        <td class="bg-success">
+             <span >Закрыта</span>
+        </td>
+             {% endif %}
+
+
+
+        {% endif %}
 
     </tr>
 

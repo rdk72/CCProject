@@ -16,6 +16,34 @@ class Home(ListView):
         context['title'] = 'Актуальные проблемы каналов связи'
         return context
 
+    def get_queryset(self):
+        return Incident.objects.filter(state="I")
+
+class History(ListView):
+    model = Incident
+    template_name = 'monitor/index.html'
+    context_object_name = 'incidents'
+#    paginate_by = 4
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'История проблем каналов связи'
+        return context
+
+class Order(ListView):
+    model = Incident
+    template_name = 'monitor/index.html'
+    context_object_name = 'incidents'
+#    paginate_by = 4
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Отчет по пропаданиям каналов связи'
+        return context
+
+    def get_queryset(self):
+        return Incident.objects.filter(state="I")
+
 class EditIncident(UpdateView):
     model = Incident
     #fields = ['provider', 'channels', 'date_time_from', 'date_time_to', 'type', 'request', 'more_info', 'state']
