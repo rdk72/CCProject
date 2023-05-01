@@ -13,7 +13,7 @@
 
 {% block content %}
 <h1>{{title}} </h1>
-<table class="table table-hover table-dark">
+<table class="table table-hover table-dark table-group-divider">
     <thead >
     <tr>
         <td>Оператор</td>
@@ -52,22 +52,37 @@
         <td>{{ incident.date_time_to|date:"d.m.y H:i" }}</td>
         <td>{{ incident.date_time_from|period:incident.date_time_to }}</td>
         <td>{{ incident.get_type_display }}</td>
-        <td>{{ incident.request }}</td>
+        <td>
+            {% if incident.request_state == 'N' %}
+
+            Заявка не заводилась
+
+            {% elif incident.request_state == 'C' %}
+
+            {{ incident.request }}<br>
+            <div class="p-1 bg-success w-100">Заявка закрыта</div>
+
+            {% elif incident.request_state == 'O' %}
+
+            {{ incident.request }}<br>
+            <div class="p-1 bg-danger w-100">Заявка открыта
+                <a data-id="{{ incident.pk }}" data-bs-toggle="modal" data-bs-target="#exampleModal" title="Закрыть заявку" href="#">X</a> </div>
+
+            {% endif %}
+        </td>
         <td>{{ incident.more_info }}</td>
         {% if request.resolver_match.url_name == 'history' %}
-
+        <td >
              {% if incident.state == 'I' %}
-        <td class="bg-danger">
-             <span >Актуальна</span>
-        </td>
+
+             <div class="p-1 bg-danger w-100"  >Актуальна</div>
+
              {% else %}
-        <td class="bg-success">
-             <span >Закрыта</span>
-        </td>
+
+             <div class="p-1 bg-success w-100">Закрыта</div>
+
              {% endif %}
-
-
-
+        </td>
         {% endif %}
 
     </tr>
@@ -76,4 +91,37 @@
 
     </tbody>
 </table>
+
+
+
+<!-- Модальное окно -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Закрытие заявки</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        Заявка будет закрыта, пометить проблему как "не актуально"?
+      </div>
+      <div class="modal-footer">
+        <button id="but1" type="button" onclick="IncHref" class="btn btn-primary">Да</button>
+        <button id="but2" type="button" onclick="IncHref" class="btn btn-primary">Нет</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function() {
+  $('a[data-bs-toggle=modal], button[data-bs-toggle=modal]').click(function () {
+    var IncidentCloseHref = "document.location='/incident/close/"+$(this).data('id')+"'";
+    alert(IncidentCloseHref)
+    $("#but1").attr('onclick', IncidentCloseHref);
+    //$('#my_element_id').val(data_id);
+  })
+});
+
+</script>
 {% endblock %}

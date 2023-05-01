@@ -5,6 +5,10 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import *
 from .forms import *
 
+def CloseRequest(request):
+    pass
+
+
 class Home(ListView):
     model = Incident
     template_name = 'monitor/index.html'

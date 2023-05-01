@@ -78,7 +78,13 @@ class Incident(models.Model):
     )
     type = models.CharField(max_length=1, choices=INCIDENT_TYPES, default="F", verbose_name="Тип проблемы")
     request = models.CharField(max_length=100, blank=True, verbose_name="Номер заявки")
-    more_info = models.CharField(max_length=400, blank=True, verbose_name='Дополнительная информация')
+    REQUEST_TYPES = (
+        ('N', 'Заявка не заводилась'),
+        ('O', 'Заявка открыта'),
+        ('C', 'Заявка закрыта'),
+    )
+    request_state = models.CharField(max_length=1, choices=REQUEST_TYPES, default="N", verbose_name="Статус заявки")
+    more_info = models.CharField(max_length=400, blank=True, verbose_name='Примечание')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
 
     def __str__(self):
