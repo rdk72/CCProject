@@ -23,7 +23,7 @@
                 <div class="navbar-nav">
                     <!--<a class="nav-link active" aria-current="page" href="/">Актуальное</a>-->
                     <a class="nav-link {% if request.resolver_match.url_name == 'history' %}active{% endif %}" href="/history/">История</a>
-                    <a class="nav-link {% if request.resolver_match.url_name == 'report' %}active{% endif %}" href="#">Отчеты</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'report' %}active{% endif %}" href="/order/">Отчеты</a>
                     <a class="nav-link {% if request.resolver_match.url_name == 'statistics' %}active{% endif %} disabled">Статистика</a>
                 </div>
             </div>

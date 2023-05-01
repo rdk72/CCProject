@@ -116,9 +116,11 @@
 <script>
 $(document).ready(function() {
   $('a[data-bs-toggle=modal], button[data-bs-toggle=modal]').click(function () {
-    var IncidentCloseHref = "document.location='/incident/close/"+$(this).data('id')+"'";
-    alert(IncidentCloseHref)
-    $("#but1").attr('onclick', IncidentCloseHref);
+    var IncidentCloseHref1 = "document.location='/incident/close/"+$(this).data('id')+"/?change_inc_state=True'";
+    var IncidentCloseHref2 = "document.location='/incident/close/"+$(this).data('id')+"/'";
+    //alert(IncidentCloseHref)
+    $("#but1").attr('onclick', IncidentCloseHref1);
+    $("#but2").attr('onclick', IncidentCloseHref2);
     //$('#my_element_id').val(data_id);
   })
 });

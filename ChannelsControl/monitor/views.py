@@ -1,12 +1,17 @@
-from django.shortcuts import render
-
+from django.shortcuts import render, redirect
+from datetime import datetime, date, time
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import *
 from .forms import *
 
-def CloseRequest(request):
-    pass
+def CloseRequest(request,incident_id):
+    inc_state = bool(request.GET.get("change_inc_state", False))
+    if inc_state:
+        Incident.objects.filter(pk=incident_id).update(request_state='C',state='C')
+    else:
+        Incident.objects.filter(pk=incident_id).update(request_state='C')
+    return redirect('home')
 
 
 class Home(ListView):
@@ -46,7 +51,7 @@ class Order(ListView):
         return context
 
     def get_queryset(self):
-        return Incident.objects.filter(state="I")
+        return Incident.objects.filter(state="I",date_time_from__date__gte=date(2023, 5, 1),date_time_to__date__lte=date(2023, 5, 2),)
 
 class EditIncident(UpdateView):
     model = Incident
