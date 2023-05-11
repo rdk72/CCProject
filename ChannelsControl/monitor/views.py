@@ -41,9 +41,12 @@ class History(ListView):
 
 class Order(ListView):
     model = Incident
-    template_name = 'monitor/index.html'
+    template_name = 'monitor/order.html'
     context_object_name = 'incidents'
 #    paginate_by = 4
+    form_class = OrderFilteringForm
+
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -51,7 +54,7 @@ class Order(ListView):
         return context
 
     def get_queryset(self):
-        return Incident.objects.filter(state="I",date_time_from__date__gte=date(2023, 5, 1),date_time_to__date__lte=date(2023, 5, 2),)
+        return Incident.objects.filter(date_time_from__date__gte=date(2023, 5, 8),date_time_from__date__lte=date(2023, 5, 14),)|Incident.objects.filter(date_time_to__date__gte=date(2023, 5, 8),date_time_to__date__lte=date(2023, 5, 14),)|Incident.objects.filter(date_time_from__date__lte=date(2023, 5, 8),date_time_to__date__gte=date(2023, 5, 14),)|Incident.objects.filter(date_time_from__date__lte=date(2023, 5, 8),date_time_to=None,)
 
 class EditIncident(UpdateView):
     model = Incident

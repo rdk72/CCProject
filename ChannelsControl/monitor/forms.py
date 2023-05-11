@@ -5,8 +5,6 @@ from .models import Incident
 class DateTimeLocalInput(forms.DateTimeInput):
     input_type = "datetime-local"
 
-
-
 class DateTimeLocalField(forms.DateTimeField):
     # Set DATETIME_INPUT_FORMATS here because, if USE_L10N
     # is True, the locale-dictated format will be applied
@@ -20,6 +18,18 @@ class DateTimeLocalField(forms.DateTimeField):
         "%Y-%m-%dT%H:%M"
     ]
     widget = DateTimeLocalInput(format="%Y-%m-%dT%H:%M",attrs={'class':'form-control'})
+
+
+class DateLocalInput(forms.DateTimeInput):
+    input_type = "date"
+class DateLocalField(forms.DateTimeField):
+
+    input_formats = [
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S.%f",
+        "%Y-%m-%dT%H:%M"
+    ]
+    widget = DateLocalInput(format="%Y-%m-%dT",attrs={'class':'form-control'})
 
 
 class IncidentEditForm(forms.ModelForm):
@@ -47,3 +57,11 @@ class IncidentEditForm(forms.ModelForm):
         }
 
 
+class OrderFilteringForm(forms.ModelForm):
+
+    date_from = DateLocalField()
+    date_from.label="Время пропадания"
+
+    date_to = DateTimeLocalField()
+    date_to.label="Время восстановления"
+    date_to.required=False
