@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from datetime import datetime, date, time
-from django.http import HttpResponse
+from datetime import datetime, date, timedelta
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import *
 from .forms import *
@@ -44,17 +44,31 @@ class Order(ListView):
     template_name = 'monitor/order.html'
     context_object_name = 'incidents'
 #    paginate_by = 4
-    form_class = OrderFilteringForm
 
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.from_date = date.fromisoformat(self.request.GET.get('trip-from'))
+            self.to_date = date.fromisoformat(self.request.GET.get('trip-to'))
+
+        except:
+            now_day = datetime.today()
+            self.from_date = now_day - timedelta(days=now_day.weekday())
+            self.to_date = now_day + timedelta(days=6 - now_day.weekday())
+
+        # call the view
+        return super(Order, self).dispatch(request, *args, **kwargs)
 
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Отчет по пропаданиям каналов связи'
+        context['from_date'] = self.from_date.strftime('%Y-%m-%d')
+        context['to_date'] = self.to_date.strftime('%Y-%m-%d')
         return context
 
     def get_queryset(self):
-        return Incident.objects.filter(date_time_from__date__gte=date(2023, 5, 8),date_time_from__date__lte=date(2023, 5, 14),)|Incident.objects.filter(date_time_to__date__gte=date(2023, 5, 8),date_time_to__date__lte=date(2023, 5, 14),)|Incident.objects.filter(date_time_from__date__lte=date(2023, 5, 8),date_time_to__date__gte=date(2023, 5, 14),)|Incident.objects.filter(date_time_from__date__lte=date(2023, 5, 8),date_time_to=None,)
+
+        return Incident.objects.filter(date_time_from__date__gte=self.from_date,date_time_from__date__lte=self.to_date,)|Incident.objects.filter(date_time_to__date__gte=self.from_date,date_time_to__date__lte=self.to_date,)|Incident.objects.filter(date_time_from__date__lte=self.from_date,date_time_to__date__gte=self.to_date,)|Incident.objects.filter(date_time_from__date__lte=self.from_date,date_time_to=None,)
 
 class EditIncident(UpdateView):
     model = Incident
@@ -76,7 +90,15 @@ class AddIncident(CreateView):
         # login_url = '/admin/'
     raise_exception = True
 
-#def index(request):
-    #incidents = Incidents.objects.all()
-#    context={'title':'Актуальные проблемы каналов'}
- #   return render(request, 'monitor/index.html', context=context)
+
+def Stat(request):
+    if request.method == 'POST':
+        form = StatFilterForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('stat'))
+
+    return render(request, 'monitor/stat.html', {
+        'form': StatFilterForm(),
+    })
+

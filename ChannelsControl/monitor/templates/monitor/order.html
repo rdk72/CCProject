@@ -12,10 +12,17 @@
 <h1>{{title}} </h1>
 
 
-<form action="/your-name/" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
+<form action="{% url 'order' %}" method="get" id="interval">
+
+  <div class="box sort pull-right">
+    <span>С:</span>
+    <input type="date" id="from" name="trip-from" value="{{ from_date }}" min="2023-03-05" max="2050-03-05">
+    <span>По:</span>
+    <input type="date" id="to" name="trip-to" value="{{ to_date }}" min="2023-03-05" max="2050-03-05">
+    <button value="Сортировка"  type="submit" >
+     Сформировать
+    </button>
+  </div>
 </form>
 
 
