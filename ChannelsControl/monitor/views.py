@@ -92,13 +92,32 @@ class AddIncident(CreateView):
 
 
 def Stat(request):
-    if request.method == 'POST':
-        form = StatFilterForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('stat'))
+    try:
+        from_date = date.fromisoformat(request.GET.get('trip-from'))
+        to_date = date.fromisoformat(request.GET.get('trip-to'))
+
+    except:
+        now_day = datetime.today()
+        from_date = now_day - timedelta(days=now_day.weekday())
+        to_date = now_day + timedelta(days=6 - now_day.weekday())
+
+    incidents = Incident.objects.filter(date_time_from__date__gte=from_date,date_time_from__date__lte=to_date,)|Incident.objects.filter(date_time_to__date__gte=from_date,date_time_to__date__lte=to_date,)|Incident.objects.filter(date_time_from__date__lte=from_date,date_time_to__date__gte=to_date,)|Incident.objects.filter(date_time_from__date__lte=from_date,date_time_to=None,)
+    result = dict()
+    if len(incidents)>0:
+        for incident in incidents:
+            if incident.date_time_from<from_date:
+                incident.date_time_from=from_date
+            if incident.date_time_to>to_date or incident.date_time_to = None:
+                incident.date_time_to=to_date
+            result.
+    else:
+        pass
+
+
 
     return render(request, 'monitor/stat.html', {
-        'form': StatFilterForm(),
+        'title':"Статистика пропаданий каналов",
+        'from_date':from_date.strftime('%Y-%m-%d'),
+        'to_date':to_date.strftime('%Y-%m-%d'),
     })
 

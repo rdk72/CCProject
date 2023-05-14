@@ -45,7 +45,3 @@ class IncidentEditForm(forms.ModelForm):
         }
 
 
-
-class StatFilterForm(forms.Form):
-    date_time_from = DateTimeLocalField()
-    date_time_from.label = "Время пропадания"
