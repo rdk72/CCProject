@@ -32,4 +32,14 @@
 </form>
 
 STAT
+
+{% for key, statitem in StatItems.items %}
+<br>
+{{ statitem.chan_name }}
+duration:
+{% delta_time_to_period statitem.duration %}
+count:
+{{ statitem.count }}
+
+{% endfor %}
 {% endblock %}

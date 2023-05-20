@@ -17,6 +17,15 @@ def period(date_from, date_to):
     return plural_days(duration.days)+'{:02}ч {:02}м'.format(hours,minutes)
 
 
+@register.simple_tag
+def delta_time_to_period(delta_time):
+    seconds = round(delta_time)
+    hours = (seconds % 86400) // 3600
+    minutes = (seconds % 3600) // 60
+    days = seconds // 86400
+    #return plural_days(duration.days)+'{:02}ч {:02}м {:02}с'.format(hours,minutes,seconds % 60 )
+    return plural_days(days)+'{:02}ч {:02}м'.format(hours,minutes)
+
 
 
 def plural_days(n):
@@ -32,3 +41,5 @@ def plural_days(n):
         p = 2
 
     return str(n) + ' ' + days[p] + ' '
+
+
