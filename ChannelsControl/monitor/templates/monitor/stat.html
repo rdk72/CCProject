@@ -17,14 +17,14 @@
       <select name="provider">
 
     <option selected value="0">Все</option>
-    <option value="Крокодил Гена">Крокодил Гена</option>
-    <option value="Шапокляк">Шапокляк</option>
-    <option value="Крыса Лариса">Крыса Лариса</option>
+   {% for provider in providers %}
+    <option value="{{provider.pk}}">{{provider}}</option>
+   {% endfor %}
    </select>
     <span>С:</span>
-    <input type="date" id="from" name="trip-from" value="{{ from_date }}" min="2023-03-05" max="2050-03-05">
+    <input type="datetime-local" id="from" name="trip-from" value="{{ from_date_time }}" min="2023-01-01T00:00" max="2030-01-01T00:00">
     <span>По:</span>
-    <input type="date" id="to" name="trip-to" value="{{ to_date }}" min="2023-03-05" max="2050-03-05">
+    <input type="datetime-local" id="to" name="trip-to" value="{{ to_date_time }}" min="2023-01-01T00:00" max="2030-01-01T00:00">
     <button type="submit" >
      Сформировать
     </button>

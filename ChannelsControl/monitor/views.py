@@ -5,6 +5,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import *
 from .forms import *
 import zoneinfo
+from django.db.models import Q
 
 
 def CloseRequest(request,incident_id):
@@ -104,49 +105,71 @@ class StatItem:
 
 def Stat(request):
     try:
-        #получили даты в get параметрах
-        from_date = date.fromisoformat(request.GET.get('trip-from'))
-        to_date = date.fromisoformat(request.GET.get('trip-to'))
+        #получили date_time в get параметрах
+        from_date_time = datetime.fromisoformat(request.GET.get('trip-from'))
+        to_date_time = datetime.fromisoformat(request.GET.get('trip-to'))
 
     except:
         now_day = datetime.today()
-        from_date = now_day - timedelta(days=now_day.weekday())
-        to_date = now_day + timedelta(days=6 - now_day.weekday())
+        from_date_time = now_day - timedelta(days=now_day.weekday())
+        from_date_time=from_date_time.replace(hour=0, minute=0)
+        to_date_time = now_day + timedelta(days=7 - now_day.weekday())
+        to_date_time=to_date_time.replace(hour=0, minute=0)
 
-#преобразуем date в datetime, устанавливаем метку часового пояса
-    from_date_dt = datetime.combine(from_date, time(hour=0, minute=0))
-    from_date_dt = from_date_dt.replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
-    #to_date_dt = datetime.combine(to_date, time(hour=23, minute=59))
-    to_date_dt = datetime.combine(to_date, time(hour=0, minute=0))
-    to_date_dt += timedelta(days=1) # если фильтруем по 5 число, значит фильтруем по 00:00 6 числа (+ 1 день)
-    to_date_dt = to_date_dt.replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
+    try:
+        #получили provider в get параметрах
+        provider = int(request.GET.get('provider'))
+    except:
+        provider = 0
 
-    incidents = Incident.objects.filter(date_time_from__date__gte=from_date,date_time_from__date__lte=to_date,)|Incident.objects.filter(date_time_to__date__gte=from_date,date_time_to__date__lte=to_date,)|Incident.objects.filter(date_time_from__date__lte=from_date,date_time_to__date__gte=to_date,)|Incident.objects.filter(date_time_from__date__lte=from_date,date_time_to=None,)
+
+    # устанавливаем метку часового пояса
+    from_date_time = from_date_time.replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
+    to_date_time = to_date_time.replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
+
+
+    if provider:
+        incidents = Incident.objects.filter(
+            Q(provider__pk=provider) &
+            (Q(date_time_from__date__gte=from_date_time, date_time_from__date__lte=to_date_time) |
+            Q(date_time_to__date__gte=from_date_time, date_time_to__date__lte=to_date_time, ) |
+            Q(date_time_from__date__lte=from_date_time, date_time_to__date__gte=to_date_time, ) |
+            Q(date_time_from__date__lte=from_date_time, date_time_to=None, )))
+
+    else:
+        incidents = Incident.objects.filter(
+            Q(date_time_from__date__gte=from_date_time, date_time_from__date__lte=to_date_time) |
+            Q(date_time_to__date__gte=from_date_time, date_time_to__date__lte=to_date_time, ) |
+            Q(date_time_from__date__lte=from_date_time, date_time_to__date__gte=to_date_time, ) |
+            Q(date_time_from__date__lte=from_date_time, date_time_to=None, ))
+
     result = dict()
     if len(incidents)>0:
         for incident in incidents:
-            print(incident.date_time_from.tzinfo)
-            print(from_date_dt.tzinfo)
-            if incident.date_time_from < from_date_dt:
-                incident.date_time_from = from_date_dt
+            if incident.date_time_from < from_date_time:
+                incident.date_time_from = from_date_time
             if incident.date_time_to is None:   #если канал(ы) не восстановился
-                incident.date_time_to = to_date_dt
-            elif incident.date_time_to > to_date_dt: #если канал восстановился позднее рассматриваемого интервала
-                incident.date_time_to = to_date_dt
+                incident.date_time_to = to_date_time
+            elif incident.date_time_to > to_date_time: #если канал восстановился позднее рассматриваемого интервала
+                incident.date_time_to = to_date_time
 
             for channel in incident.channels.all():
                 result.setdefault(channel.pk, StatItem(channel.provider.name+" "+channel.__str__())).add(incident.date_time_to.timestamp()-incident.date_time_from.timestamp())
     else:
         pass
 
+    #выполняем сортировку по суммарной продолжительности пропадания канала
+    sorted_tuple = sorted(result.items(), key=lambda x: -x[1].duration) #x[0] pk канала, x[1] StatItem канала
+    result = dict(sorted_tuple)
 
-
-
+    #формируем список операторов для заполнения select'а
+    providers = Provider.objects.all()
 
     return render(request, 'monitor/stat.html', {
         'title':"Статистика пропаданий каналов",
-        'from_date':from_date.strftime('%Y-%m-%d'),
-        'to_date':to_date.strftime('%Y-%m-%d'),
+        'from_date_time':from_date_time.strftime('%Y-%m-%dT%H:%M'),
+        'to_date_time':to_date_time.strftime('%Y-%m-%dT%H:%M'),
         'StatItems':result,
+        'providers':providers,
     })
 
