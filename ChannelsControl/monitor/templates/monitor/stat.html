@@ -16,30 +16,52 @@
       Оператор:
       <select name="provider">
 
-    <option selected value="0">Все</option>
+    <option {% if provider_selected == 0 %} selected {% endif %} value="0">Все</option>
    {% for provider in providers %}
-    <option value="{{provider.pk}}">{{provider}}</option>
+    <option {% if provider_selected == provider.pk %} selected {% endif %} value="{{provider.pk}}">{{provider}}</option>
    {% endfor %}
    </select>
-    <span>С:</span>
-    <input type="datetime-local" id="from" name="trip-from" value="{{ from_date_time }}" min="2023-01-01T00:00" max="2030-01-01T00:00">
-    <span>По:</span>
-    <input type="datetime-local" id="to" name="trip-to" value="{{ to_date_time }}" min="2023-01-01T00:00" max="2030-01-01T00:00">
-    <button type="submit" >
-     Сформировать
-    </button>
+
+      <span>С:</span>
+      <input type="datetime-local" id="from" name="trip-from" value="{{ from_date_time }}" min="2023-01-01T00:00" max="2030-01-01T00:00">
+
+      <span>По:</span>
+      <input type="datetime-local" id="to" name="trip-to" value="{{ to_date_time }}" min="2023-01-01T00:00" max="2030-01-01T00:00">
+
+      <button type="submit" >Сформировать</button>
   </div>
 </form>
 
-STAT
+<table class="table table-hover table-dark table-group-divider">
+    <thead >
+    <tr>
+        <td>Оператор</td>
+        <td>Канал связи</td>
+        <td>Простой</td>
+        <td>Количество пропаданий</td>
+    </tr>
+    </thead>
+    <tbody>
 
-{% for key, statitem in StatItems.items %}
-<br>
-{{ statitem.chan_name }}
-duration:
-{% delta_time_to_period statitem.duration %}
-count:
-{{ statitem.count }}
+    {% for key, statitem in StatItems.items %}
+    <tr>
+        <td>
+            {{ statitem.provider_name }}
+        </td>
+        <td>
+            {{ statitem.chan_name }}
+        </td>
+        <td>
+            {% delta_time_to_period statitem.duration %}
+        </td>
+        <td>
+            {{ statitem.count }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
-{% endfor %}
+
+
 {% endblock %}

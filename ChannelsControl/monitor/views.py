@@ -93,11 +93,13 @@ class AddIncident(CreateView):
         # login_url = '/admin/'
     raise_exception = True
 
+#класс для хранения элементов статистики (каналов)
 class StatItem:
-    def __init__(self, chan_name, duration=0, count=0):
+    def __init__(self, chan_name, provider_name, duration=0, count=0):
         self.duration = duration
         self.count = count
         self.chan_name = chan_name
+        self.provider_name = provider_name
 
     def add(self,duration):
         self.duration += duration
@@ -154,7 +156,7 @@ def Stat(request):
                 incident.date_time_to = to_date_time
 
             for channel in incident.channels.all():
-                result.setdefault(channel.pk, StatItem(channel.provider.name+" "+channel.__str__())).add(incident.date_time_to.timestamp()-incident.date_time_from.timestamp())
+                result.setdefault(channel.pk, StatItem(channel.__str__(),channel.provider)).add(incident.date_time_to.timestamp()-incident.date_time_from.timestamp())
     else:
         pass
 
@@ -171,5 +173,6 @@ def Stat(request):
         'to_date_time':to_date_time.strftime('%Y-%m-%dT%H:%M'),
         'StatItems':result,
         'providers':providers,
+        'provider_selected':provider,
     })
 
