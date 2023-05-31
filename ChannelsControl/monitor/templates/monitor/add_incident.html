@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load monitor_tags %}
+
+
+{% block title %}
+{{title}} :: {{block.super}}
+{% endblock %}
+
+
+
+{% block content %}
+    <h1>Новая проблема каналов связи</h1>
+    <form action="" method="post">{% csrf_token %}
+      {{ form.as_p }}
+    {{ form.media.js }}
+      <input type="submit" value="Save" />
+    </form>
+{% endblock %}

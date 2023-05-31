@@ -87,8 +87,10 @@ class EditIncident(UpdateView):
 
 
 class AddIncident(CreateView):
- #       form_class = NewsForm
-    template_name = 'news/add_incident.html'
+    model = Incident
+    template_name = 'monitor/add_incident.html'
+    form_class = IncidentEditForm
+    #fields = ['provider', 'channels', 'date_time_from', 'date_time_to', 'state', 'type',  'request', 'request_state', 'more_info']
         # success_url = reverse_lazy('home')
         # login_url = '/admin/'
     raise_exception = True
