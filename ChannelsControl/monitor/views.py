@@ -33,14 +33,38 @@ class Home(ListView):
 
 class History(ListView):
     model = Incident
-    template_name = 'monitor/index.html'
+    template_name = 'monitor/history.html'
     context_object_name = 'incidents'
-#    paginate_by = 4
+    paginate_by = 5
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.from_date = date.fromisoformat(self.request.GET.get('trip-from'))
+            self.to_date = date.fromisoformat(self.request.GET.get('trip-to'))
+            #переменная для фрмирования url перед параметром "page"
+            self.pre_paginate = "?trip-from="+str(self.request.GET.get('trip-from'))+"&trip-to="+str(self.request.GET.get('trip-to'))+"&"
+
+        except:
+            now_day = datetime.today()
+            self.from_date = now_day - timedelta(days=now_day.weekday())
+            self.to_date = now_day + timedelta(days=6 - now_day.weekday())
+            self.pre_paginate = "?"
+
+        # call the view
+        return super(History, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'История проблем каналов связи'
+        context['from_date'] = self.from_date.strftime('%Y-%m-%d')
+        context['to_date'] = self.to_date.strftime('%Y-%m-%d')
+        context['pre_paginate'] = self.pre_paginate
         return context
+
+    def get_queryset(self):
+
+        return Incident.objects.filter(date_time_from__date__gte=self.from_date,date_time_from__date__lte=self.to_date,)|Incident.objects.filter(date_time_to__date__gte=self.from_date,date_time_to__date__lte=self.to_date,)|Incident.objects.filter(date_time_from__date__lte=self.from_date,date_time_to__date__gte=self.to_date,)|Incident.objects.filter(date_time_from__date__lte=self.from_date,date_time_to=None,)
+
 
 class Order(ListView):
     model = Incident
@@ -91,9 +115,11 @@ class AddIncident(CreateView):
     template_name = 'monitor/add_incident.html'
     form_class = IncidentEditForm
     #fields = ['provider', 'channels', 'date_time_from', 'date_time_to', 'state', 'type',  'request', 'request_state', 'more_info']
-        # success_url = reverse_lazy('home')
-        # login_url = '/admin/'
+
     raise_exception = True
+    def get_success_url(self):
+        return reverse("home")
+    # login_url = '/admin/'
 
 #класс для хранения элементов статистики (каналов)
 class StatItem:

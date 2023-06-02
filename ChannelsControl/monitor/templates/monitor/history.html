@@ -9,7 +9,21 @@
 
 
 {% block content %}
-<h1 style="display: inline;">{{title}}</h1> &nbsp; &nbsp; &nbsp;  <a href="/incident/add_incident/"><h3 style="display: inline;">+ новая проблема</h3></a>
+<h1>{{title}}</h1>
+
+<form action="{% url 'history' %}" method="get" id="interval">
+
+  <div class="box sort pull-right">
+    <span>С:</span>
+    <input type="date" id="from" name="trip-from" value="{{ from_date }}" min="2023-03-05" max="2050-03-05">
+    <span>По:</span>
+    <input type="date" id="to" name="trip-to" value="{{ to_date }}" min="2023-03-05" max="2050-03-05">
+    <button value="Сортировка"  type="submit" >
+     Сформировать
+    </button>
+  </div>
+</form>
+
 <table class="table table-hover table-dark table-group-divider">
     <thead >
     <tr>
@@ -21,6 +35,8 @@
         <td>Тип проблемы</td>
         <td>Номер заявки</td>
         <td>Примечание</td>
+        <td>Статус</td>
+
 
     </tr>
     </thead>
@@ -64,6 +80,18 @@
             {% endif %}
         </td>
         <td>{{ incident.more_info }}</td>
+        <td >
+             {% if incident.state == 'I' %}
+
+             <div class="p-1 bg-danger w-100"  >Актуальна</div>
+
+             {% else %}
+
+             <div class="p-1 bg-success w-100">Закрыта</div>
+
+             {% endif %}
+        </td>
+
     </tr>
 
     {% endfor %}
@@ -71,6 +99,37 @@
     </tbody>
 </table>
 
+
+            {% if page_obj.has_other_pages %}
+    <div class="pegination">
+        <div class="nav-links">
+            {% if page_obj.has_previous %}
+            <a class="page-numbers" href="{{ pre_paginate }}page={{page_obj.previous_page_number}}"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+            {% endif %}
+
+            {% if page_obj.number > 2 %}
+            <a class="page-numbers" href="{{ pre_paginate }}page={{ page_obj.number|add:'-2'}}">{{ page_obj.number|add:'-2'}}</a>
+            {% endif %}
+
+            {% if page_obj.has_previous %}
+            <a class="page-numbers" href="{{ pre_paginate }}page={{page_obj.previous_page_number}}">{{ page_obj.previous_page_number}}</a>
+            {% endif %}
+
+            <span class="page-numbers current">{{page_obj.number}}</span>
+
+            {% if page_obj.has_next %}
+            <a class="page-numbers" href="{{ pre_paginate }}page={{page_obj.next_page_number}}">{{page_obj.next_page_number}}</a>
+            {% endif %}
+            {% if  page_obj.paginator.num_pages > page_obj.next_page_number %}
+            <a class="page-numbers" href="{{ pre_paginate }}page={{ page_obj.number|add:'2'}}">{{ page_obj.number|add:'2'}}</a>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+            <a class="page-numbers" href="{{ pre_paginate }}page={{page_obj.next_page_number}}"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+            {% endif %}
+        </div>
+    </div>
+        {% endif %}
 
 
 <!-- Модальное окно -->
