@@ -179,11 +179,14 @@ def Stat(request):
             if incident.date_time_from < from_date_time:
                 incident.date_time_from = from_date_time
             if incident.date_time_to is None:   #если канал(ы) не восстановился
-                incident.date_time_to = to_date_time
+                if datetime.now().replace(tzinfo=zoneinfo.ZoneInfo("UTC")) < to_date_time:           #если to_date_time еще не наступил
+                    incident.date_time_to = datetime.now().replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
+                else:
+                    incident.date_time_to = to_date_time
             elif incident.date_time_to > to_date_time: #если канал восстановился позднее рассматриваемого интервала
                 incident.date_time_to = to_date_time
 
-            for channel in incident.channels.all():
+            for channel in incident.channels.all(): # проходим циклом по всем пропаданиям и заполняем статистику
                 result.setdefault(channel.pk, StatItem(channel.__str__(),channel.provider)).add(incident.date_time_to.timestamp()-incident.date_time_from.timestamp())
     else:
         pass
@@ -191,6 +194,12 @@ def Stat(request):
     #выполняем сортировку по суммарной продолжительности пропадания канала
     sorted_tuple = sorted(result.items(), key=lambda x: -x[1].duration) #x[0] pk канала, x[1] StatItem канала
     result = dict(sorted_tuple)
+
+    sum_item = StatItem(str(len(result))+" канала(-ов)", "Суммарно")  # создаём StatItem для подведения итогов внизу таблицы
+    sum_item.duration = sum(si.duration for si in result.values())
+    sum_item.count = sum(si.count for si in result.values())
+
+    result[0]=sum_item
 
     #формируем список операторов для заполнения select'а
     providers = Provider.objects.all()
